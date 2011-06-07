@@ -17,10 +17,11 @@ Jeweler::Tasks.new do |gem|
   gem.name = "epas"
   gem.homepage = "http://github.com/rsalvado/epas"
   gem.license = "MIT"
-  gem.summary = %Q{TODO: one-line summary of your gem}
-  gem.description = %Q{TODO: longer description of your gem}
+  gem.summary = %Q{Script to autosign ec2 instances into puppet.}
+  gem.description = %Q{To be run in a cron script or a daemon. Autosigns ec2 instances based on hostname and instance_id, it expects instance_id as part of the ec2 instance hostname.}
   gem.email = "rsalvado@gnuine.com"
   gem.authors = ["Ramon Salvadó"]
+  gem.executables = ["ec2-puppet-autosigner"]
   # dependencies defined in Gemfile
 end
 Jeweler::RubygemsDotOrgTasks.new

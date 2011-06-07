@@ -1,9 +1,43 @@
 = epas
 
-Description goes here.
+This gem provides a simple script to autosign ec2 instances into puppet. This way you can launch new instances in ec2 and avoid having to sign them manually.
+
+First it checks to see if there is any pending sign request, if there is it makes a query to AWS to obtain the instance_id of all machines. If any of this ids matches with the hostname of the request it signs it.
+
+For example if we launch a new ec2 server whose instance id is i-12345 and we insert this id into the hostname (using user-data for example), and this server makes a request to our puppet master, this script will autosign the request.
+
+    # user-data script example
+    # Helper functions
+    die() { status=$1; shift; echo "FATAL: $*"; exit $status; }
+    instance_id="`wget -q -O - http://169.254.169.254/latest/meta-data/instance-id || die \"wget instance-id has failed: $?\"`"
+    # 1) Proper hostname setup (to be used by puppet)
+    hostname="${instance_id}"
+    echo $hostname > /proc/sys/kernel/hostname
+    sed -i "s|localhost.localdomain|$hostname|g" /etc/sysconfig/network
+    sed -i "s|localhost.localdomain|localhost.localdomain $hostname|g" /etc/hosts
+    service puppet start
+
+It expects to be run in a puppet-master server in a cron job or similar.
+
+By default it reads aws credentials from "~/.awssecret" which should be a file with the aws id and the aws secret in separate lines.
+
+Example contents of "~/.awssecret":
+
+    1D43DD69O8EJGS3X2WR2
+    zDWZH14jYZU0KBn09dCTHRQUJFAvpPz155o23Qu7
+
+You can also pass another file as an argument:
+
+    # Example cron job 1.
+    * * * * * ec2-puppet-autosigner /path/to/aws_credentials
+
+By defaults it checks all avaliable regions, but you can also pass the regions you want to check as parameters:
+
+   # Example cron job 2.
+   * * * * * ec2-puppet-autosigner /path/to/aws_credentials eu-west-1 us-east-1
 
 == Contributing to epas
- 
+
 * Check out the latest master to make sure the feature hasn't been implemented or the bug hasn't been fixed yet
 * Check out the issue tracker to make sure someone already hasn't requested it and/or contributed it
 * Fork the project
