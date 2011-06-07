@@ -11,4 +11,5 @@ credentials_file = ARGV[0] || "~/.awssecret"
 ec2_regions = ARGV.drop(1)
 
 # TODO: Add proper command line arguments handling
-Epas::AutoSigner.new(credentials_file, ec2_regions)
+epas = Epas::AutoSigner.new(credentials_file, ec2_regions)
+epas.sign_ec2_instance_requests!

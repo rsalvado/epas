@@ -1,5 +1,6 @@
 require 'active_support/core_ext/object/blank'
 require 'active_support/core_ext/kernel/reporting'
+require 'aws'
 
 module Epas
 
@@ -19,10 +20,10 @@ module Epas
     #
     #    Epas::Autosigner.new
     #    Epas::AutoSigner.new myfile, [ 'eu-west-1', 'eu-east-1']
-    def initialize(file = "~/.awssecret", regions = nil)
+    def initialize(file = "~/.awssecret", regions = [])
       raise UnavailablePuppet unless command?('puppet') && command?('puppetca')
       @aws_id, @aws_key        = read_aws_credentials(file)
-      @regions                 = regions || get_all_ec2_regions
+      @regions                 = regions.blank? ? get_all_ec2_regions : regions
       @awaiting_sign_instances = get_awaiting_sign_instances
     end
 

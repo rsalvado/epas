@@ -31,12 +31,12 @@ Example contents of "~/.awssecret":
 You can also pass another file as an argument:
 
     # Example cron job 1.
-    * * * * * ec2-puppet-autosigner /path/to/aws_credentials
+    * * * * * /bin/bash -l -c '/usr/local/bin/ec2-puppet-autosigner /path/to/aws_credentials'
 
 By defaults it checks all avaliable regions, but you can also pass the regions you want to check as parameters:
 
    # Example cron job 2.
-   * * * * * ec2-puppet-autosigner /path/to/aws_credentials eu-west-1 us-east-1
+   * * * * * /bin/bash -l -c '/usr/local/bin/ec2-puppet-autosigner /path/to/aws_credentials eu-west-1 us-east-1'
 
 == Contributing to epas
 
