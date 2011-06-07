@@ -1,5 +1,7 @@
 = epas
 
+The <b>epas<b> acronym stands for EC2 Puppet Auto Signer.
+
 This gem provides a simple script to autosign ec2 instances into puppet. This way you can launch new instances in ec2 and avoid having to sign them manually.
 
 First it checks to see if there is any pending sign request, if there is it makes a query to AWS to obtain the instance_id of all machines. If any of this ids matches with the hostname of the request it signs it.
