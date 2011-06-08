@@ -1,3 +1,4 @@
+require 'syslog'
 require 'active_support/core_ext/object/blank'
 require 'active_support/core_ext/kernel/reporting'
 require 'aws'
@@ -50,10 +51,17 @@ module Epas
     end
 
     def sign_instance(hostname)
-      `puppet cert --sign #{hostname}`
+      # TODO: Run with sudo if not root
+      result = system("puppet cert --sign #{hostname}")
+      if result
+        log "Server with hostname: #{hostname} signed succesfully."
+      else
+        log "Failed to sign server with hostname: #{hostname}"
+      end
     end
 
     def get_awaiting_sign_instances
+      # TODO: Run with sudo if not root
       `puppetca --list`.split("\n")
     end
 
@@ -72,6 +80,11 @@ module Epas
 
     def command?(command)
       system("which #{command} > /dev/null 2>&1")
+    end
+
+    def log(message)
+      # $0 is the current script name
+      Syslog.open($0, Syslog::LOG_PID | Syslog::LOG_CONS) { |s| s.warning message }
     end
 
   end

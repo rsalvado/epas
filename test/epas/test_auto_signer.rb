@@ -1,6 +1,7 @@
 require 'helper'
 require 'tempfile'
 require 'aws'
+require 'syslog'
 
 class TestAutoSigner < Test::Unit::TestCase
 
@@ -45,19 +46,29 @@ class TestAutoSigner < Test::Unit::TestCase
   end
 
   def test_should_sign_our_ec2_instances_certificate_requests
+    with_ec2_testcase
+  end
 
+  def test_should_log_when_signing_instances
+    with_ec2_testcase do
+      Syslog.expects(:open).twice
+    end
+  end
+
+  private
+
+  def with_ec2_testcase
     @instances_by_region.each do |region, instances|
-      ::Aws::Ec2.expects(:new).with(@aws_id, @aws_key, :region => region).returns(stub(:describe_instances => instances))
+      Aws::Ec2.expects(:new).with(@aws_id, @aws_key, :region => region).returns(stub(:describe_instances => instances))
     end
 
     Epas::AutoSigner.any_instance.expects(:`).with('puppetca --list').returns(@awaiting_sign_instances)
 
-    Epas::AutoSigner.any_instance.expects(:`).with("puppet cert --sign appserver.i-qwerty.example.com").once
-    Epas::AutoSigner.any_instance.expects(:`).with("puppet cert --sign dbserver.i-uiop.com").once
-
+    Epas::AutoSigner.any_instance.expects(:system).with("puppet cert --sign appserver.i-qwerty.example.com").once
+    Epas::AutoSigner.any_instance.expects(:system).with("puppet cert --sign dbserver.i-uiop.com").once
+    yield if block_given?
     autosigner = Epas::AutoSigner.new(@credentials_file.path, @regions)
     autosigner.sign_ec2_instance_requests!
-
   end
 
 end
