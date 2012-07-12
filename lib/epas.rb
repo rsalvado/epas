@@ -52,6 +52,8 @@ module Epas
 
     def sign_instance(hostname)
       # TODO: Run with sudo if not root
+      hostname.strip!
+      hostname = hostname.split(" ")[0]
       result = system("puppet cert --sign #{hostname}")
       if result
         log "Server with hostname: #{hostname} signed succesfully."
