@@ -16,7 +16,7 @@ GEM
       rake
     linecache (0.43)
     mocha (0.9.12)
-    rake (0.9.2)
+    rake (13.0.1)
     rcov (0.9.9)
     reek (1.2.8)
       ruby2ruby (~> 1.2)
